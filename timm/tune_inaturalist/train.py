@@ -725,12 +725,12 @@ if __name__ == '__main__':
 # python /root/tree_cllassfication/timm/tune_inaturalist/train.py \
 #     --train-dir /root/autodl-fs/dataset_150 \
 #     --val-dir /root/autodl-fs/val \
-#     --model efficientnet_b0 \
+#     --model vit_base_patch16_224 \
 #     --epochs 100 \
 #     --batch-size 64 \
-#     --lr 0.0001 \
+#     --lr 0.00005 \
 #     --weight-decay 1e-2 \
 #     --drop-rate 0.1 \
 #     --early-stopping 20 \
 #     --pretrained \
-#     --output-dir /root/autodl-fs/val/outputs/eff-b0-1
+#     --output-dir /root/autodl-fs/val/outputs/bit-base-1
