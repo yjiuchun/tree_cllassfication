@@ -433,7 +433,11 @@ def main():
     
     # 数据参数
     parser.add_argument('--dataset', type=str, default='dataset',
-                       help='数据集路径')
+                       help='数据集路径（当 train-dir 和 val-dir 未指定时使用）')
+    parser.add_argument('--train-dir', type=str, default=None,
+                       help='训练集目录路径（如果指定，则使用此目录作为训练集，需要同时指定 --val-dir）')
+    parser.add_argument('--val-dir', type=str, default=None,
+                       help='验证集目录路径（如果指定，则使用此目录作为验证集和测试集，需要同时指定 --train-dir）')
     parser.add_argument('--batch-size', type=int, default=32,
                        help='批次大小 (default: 32)')
     parser.add_argument('--image-size', type=int, default=224,
@@ -441,9 +445,9 @@ def main():
     parser.add_argument('--num-workers', type=int, default=4,
                        help='数据加载线程数 (default: 4)')
     parser.add_argument('--val-split', type=float, default=0.2,
-                       help='验证集比例 (default: 0.2)')
+                       help='验证集比例 (default: 0.2，当 train-dir 和 val-dir 未指定时使用)')
     parser.add_argument('--test-split', type=float, default=0.1,
-                       help='测试集比例 (default: 0.1)')
+                       help='测试集比例 (default: 0.1，当 train-dir 和 val-dir 未指定时使用)')
     
     # 模型参数
     parser.add_argument('--model', type=str, default='resnet50',
@@ -517,6 +521,10 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     
+    # 验证参数
+    if (args.train_dir is not None and args.val_dir is None) or (args.train_dir is None and args.val_dir is not None):
+        parser.error("--train-dir 和 --val-dir 必须同时指定或同时不指定")
+    
     # 创建数据加载器
     print("\n" + "="*50)
     print("加载数据集...")
@@ -540,6 +548,8 @@ def main():
         test_split=args.test_split,
         seed=args.seed,
         use_inat_norm=args.use_inat_norm,
+        train_dir=args.train_dir,
+        val_dir=args.val_dir,
     )
     
     num_classes = len(class_names)
@@ -706,8 +716,21 @@ if __name__ == '__main__':
 #     --model vit_base_patch16_224 \
 #     --epochs 100 \
 #     --batch-size 32 \
-#     --lr 0.001 \
+#     --lr 0.0001 \
 #     --weight-decay 1e-2 \
 #     --drop-rate 0.1 \
 #     --early-stopping 20 \
 #     --pretrained
+
+# python /root/tree_cllassfication/timm/tune_inaturalist/train.py \
+#     --train-dir /root/autodl-fs/dataset_150 \
+#     --val-dir /root/autodl-fs/val \
+#     --model efficientnet_b0 \
+#     --epochs 100 \
+#     --batch-size 64 \
+#     --lr 0.0001 \
+#     --weight-decay 1e-2 \
+#     --drop-rate 0.1 \
+#     --early-stopping 20 \
+#     --pretrained \
+#     --output-dir /root/autodl-fs/val/outputs/eff-b0-1

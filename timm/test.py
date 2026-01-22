@@ -33,7 +33,7 @@ inat21_class_names = name_model.default_cfg["label_names"]
 
 # 4. 加载图片+预处理+推理
 
-img_path = "/home/yjc/Project/plant_classfication/images/Camphor tree/1.jpg"
+img_path = "/root/autodl-fs/dataset_150/0_05823_humilis/00bfc468-ea01-46bd-96c4-a6f9b95b13dd.jpg"
 
 img = Image.open(img_path).convert('RGB')  # 强制转RGB，避免灰度图报错
 img_tensor = transform(img).unsqueeze(0)   # 增加batch维度：[3,336,336] → [1,3,336,336]

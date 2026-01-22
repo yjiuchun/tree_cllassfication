@@ -94,7 +94,7 @@ def get_transforms(
 
 
 def create_dataloaders(
-    dataset_path: str,
+    dataset_path: str = None,
     batch_size: int = 32,
     image_size: int = 224,
     num_workers: int = 4,
@@ -104,32 +104,39 @@ def create_dataloaders(
     mean: Optional[Tuple[float, float, float]] = None,
     std: Optional[Tuple[float, float, float]] = None,
     use_inat_norm: bool = False,
+    train_dir: Optional[str] = None,
+    val_dir: Optional[str] = None,
 ) -> Tuple[DataLoader, DataLoader, DataLoader, list]:
     """
     创建训练、验证和测试数据加载器
     
     Args:
-        dataset_path: 数据集根目录路径
+        dataset_path: 数据集根目录路径（当 train_dir 和 val_dir 未指定时使用）
         batch_size: 批次大小
         image_size: 输入图像尺寸
         num_workers: 数据加载线程数
-        val_split: 验证集比例
-        test_split: 测试集比例
+        val_split: 验证集比例（当 train_dir 和 val_dir 未指定时使用）
+        test_split: 测试集比例（当 train_dir 和 val_dir 未指定时使用，已废弃）
         seed: 随机种子
         mean: 归一化均值
         std: 归一化标准差
+        use_inat_norm: 是否使用 iNaturalist 归一化
+        train_dir: 训练集目录路径（如果指定，则使用此目录作为训练集）
+        val_dir: 验证集目录路径（如果指定，则使用此目录作为验证集，测试集也使用此目录）
     
     Returns:
         train_loader, val_loader, test_loader, class_names
     """
-    dataset_path = Path(dataset_path)
-    if not dataset_path.exists():
-        raise ValueError(f"数据集路径不存在: {dataset_path}")
-    
-    # 创建自定义数据集类，从文件夹名称提取标签
+    # 创建自定义数据集类，从文件夹名称提取标签（两个分支都需要使用）
     class LabeledImageFolder(Dataset):
         """从文件夹名称提取标签的数据集类"""
-        def __init__(self, root, transform=None):
+        def __init__(self, root, transform=None, class_mapping=None):
+            """
+            Args:
+                root: 数据集根目录
+                transform: 数据变换（已废弃，使用外部的 TransformedDataset）
+                class_mapping: 类别映射字典 {folder_name: class_idx}，如果提供则使用此映射（用于验证集）
+            """
             self.root = Path(root)
             self.transform = transform
             self.samples = []
@@ -140,54 +147,86 @@ def create_dataloaders(
             # 扫描所有文件夹
             folders = sorted([d for d in self.root.iterdir() if d.is_dir()])
             
-            # 从文件夹名称提取标签和类别名
-            folder_info = []
-            for folder in folders:
-                folder_name = folder.name
-                # 提取第一个下划线前的数字作为标签
-                if '_' in folder_name:
-                    label_str = folder_name.split('_')[0]
-                    try:
-                        label = int(label_str)
-                        folder_info.append((label, folder_name, folder))
-                    except ValueError:
-                        print(f"警告: 无法从文件夹名称 '{folder_name}' 提取标签，跳过")
-                        continue
-                else:
-                    print(f"警告: 文件夹名称 '{folder_name}' 不包含下划线，跳过")
-                    continue
-            
-            # 按标签排序并重新映射为连续标签（0, 1, 2, ...）
-            folder_info.sort(key=lambda x: x[0])
-            
-            for new_idx, (original_label, folder_name, folder_path) in enumerate(folder_info):
-                self.class_to_idx[folder_name] = new_idx
-                self.idx_to_class[new_idx] = folder_name
-                self.class_names.append(folder_name)
+            # 如果提供了类别映射（用于验证集），使用该映射
+            if class_mapping is not None:
+                self.class_to_idx = class_mapping
+                # 反向映射
+                self.idx_to_class = {v: k for k, v in class_mapping.items()}
+                self.class_names = [self.idx_to_class[i] for i in sorted(self.idx_to_class.keys())]
                 
-                # 收集该文件夹下的所有图片
-                image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.JPG', '.JPEG', '.PNG', '.BMP'}
-                images = []
-                for f in folder_path.iterdir():
-                    if not f.is_file():
+                # 收集图片
+                for folder in folders:
+                    folder_name = folder.name
+                    if folder_name not in self.class_to_idx:
+                        print(f"警告: 验证集中的文件夹 '{folder_name}' 不在训练集的类别中，跳过")
                         continue
-                    # 跳过 macOS 隐藏文件（以 ._ 开头）
-                    if f.name.startswith('._'):
+                    
+                    class_idx = self.class_to_idx[folder_name]
+                    
+                    # 收集该文件夹下的所有图片
+                    image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.JPG', '.JPEG', '.PNG', '.BMP'}
+                    images = []
+                    for f in folder.iterdir():
+                        if not f.is_file():
+                            continue
+                        # 跳过 macOS 隐藏文件（以 ._ 开头）
+                        if f.name.startswith('._'):
+                            continue
+                        # 检查文件扩展名
+                        if f.suffix.lower() in image_extensions:
+                            images.append(f)
+                    
+                    for img_path in images:
+                        self.samples.append((str(img_path.resolve()), class_idx))
+            else:
+                # 从文件夹名称提取标签和类别名（用于训练集）
+                folder_info = []
+                for folder in folders:
+                    folder_name = folder.name
+                    # 提取第一个下划线前的数字作为标签
+                    if '_' in folder_name:
+                        label_str = folder_name.split('_')[0]
+                        try:
+                            label = int(label_str)
+                            folder_info.append((label, folder_name, folder))
+                        except ValueError:
+                            print(f"警告: 无法从文件夹名称 '{folder_name}' 提取标签，跳过")
+                            continue
+                    else:
+                        print(f"警告: 文件夹名称 '{folder_name}' 不包含下划线，跳过")
                         continue
-                    # 检查文件扩展名
-                    if f.suffix.lower() in image_extensions:
-                        images.append(f)
                 
-                for img_path in images:
-                    self.samples.append((str(img_path.resolve()), new_idx))  # 使用绝对路径
-            
-            print(f"数据集信息:")
-            print(f"  - 总类别数: {len(self.class_names)}")
-            print(f"  - 类别映射:")
-            for idx, name in enumerate(self.class_names):
-                original_label = name.split('_')[0]
-                print(f"    标签 {idx} <- 文件夹 '{name}' (原始标签: {original_label})")
-            print(f"  - 总样本数: {len(self.samples)}")
+                # 按标签排序并重新映射为连续标签（0, 1, 2, ...）
+                folder_info.sort(key=lambda x: x[0])
+                
+                for new_idx, (original_label, folder_name, folder_path) in enumerate(folder_info):
+                    self.class_to_idx[folder_name] = new_idx
+                    self.idx_to_class[new_idx] = folder_name
+                    self.class_names.append(folder_name)
+                    
+                    # 收集该文件夹下的所有图片
+                    image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.JPG', '.JPEG', '.PNG', '.BMP'}
+                    images = []
+                    for f in folder_path.iterdir():
+                        if not f.is_file():
+                            continue
+                        # 跳过 macOS 隐藏文件（以 ._ 开头）
+                        if f.name.startswith('._'):
+                            continue
+                        # 检查文件扩展名
+                        if f.suffix.lower() in image_extensions:
+                            images.append(f)
+                    
+                    for img_path in images:
+                        self.samples.append((str(img_path.resolve()), new_idx))  # 使用绝对路径
+                
+                print(f"数据集信息:")
+                print(f"  - 总类别数: {len(self.class_names)}")
+                print(f"  - 类别映射:")
+                for idx, name in enumerate(self.class_names):
+                    original_label = name.split('_')[0]
+                    print(f"    标签 {idx} <- 文件夹 '{name}' (原始标签: {original_label})")
+                print(f"  - 总样本数: {len(self.samples)}")
             
             if len(self.samples) == 0:
                 raise ValueError(
@@ -214,8 +253,103 @@ def create_dataloaders(
         def __len__(self):
             return len(self.samples)
     
-    # 使用自定义数据集类
-    full_dataset = LabeledImageFolder(root=str(dataset_path))
+    # 如果指定了 train_dir 和 val_dir，使用指定的目录
+    if train_dir is not None and val_dir is not None:
+        train_path = Path(train_dir)
+        val_path = Path(val_dir)
+        
+        if not train_path.exists():
+            raise ValueError(f"训练集目录不存在: {train_path}")
+        if not val_path.exists():
+            raise ValueError(f"验证集目录不存在: {val_path}")
+        
+        print(f"使用指定的训练集和验证集目录:")
+        print(f"  - 训练集: {train_path}")
+        print(f"  - 验证集: {val_path}")
+        print(f"  - 测试集: {val_path} (与验证集相同)")
+        
+        # 创建带变换的数据集包装器（需要先定义）
+        class TransformedDataset(Dataset):
+            def __init__(self, dataset, transform):
+                self.dataset = dataset
+                self.transform = transform
+            
+            def __getitem__(self, index):
+                img, label = self.dataset[index]
+                if self.transform:
+                    img = self.transform(img)
+                return img, label
+            
+            def __len__(self):
+                return len(self.dataset)
+        
+        # 加载训练集
+        train_dataset_full = LabeledImageFolder(root=str(train_path))
+        train_class_names = train_dataset_full.class_names
+        
+        # 加载验证集（使用训练集的类别映射）
+        val_dataset_full = LabeledImageFolder(root=str(val_path), class_mapping=train_dataset_full.class_to_idx)
+        
+        # 确保验证集的类别在训练集中存在
+        print(f"\n类别信息:")
+        print(f"  - 训练集类别数: {len(train_class_names)}")
+        print(f"  - 验证集类别数: {len(val_dataset_full.class_names)}")
+        
+        class_names = train_class_names
+        num_classes = len(class_names)
+        
+        print(f"  - 训练集样本数: {len(train_dataset_full)}")
+        print(f"  - 验证集样本数: {len(val_dataset_full)}")
+        
+        # 应用变换
+        train_transform = get_transforms(image_size, is_training=True, mean=mean, std=std, use_inat_norm=use_inat_norm)
+        val_transform = get_transforms(image_size, is_training=False, mean=mean, std=std, use_inat_norm=use_inat_norm)
+        
+        train_dataset = TransformedDataset(train_dataset_full, train_transform)
+        val_dataset = TransformedDataset(val_dataset_full, val_transform)
+        test_dataset = TransformedDataset(val_dataset_full, val_transform)  # 测试集使用验证集
+        
+        print(f"  - 测试集样本数: {len(test_dataset)} (与验证集相同)")
+        
+        # 创建数据加载器
+        train_loader = DataLoader(
+            train_dataset,
+            batch_size=batch_size,
+            shuffle=True,
+            num_workers=num_workers,
+            pin_memory=True,
+            drop_last=True,  # 训练时丢弃最后一个不完整的batch
+        )
+        
+        val_loader = DataLoader(
+            val_dataset,
+            batch_size=batch_size,
+            shuffle=True,
+            num_workers=num_workers,
+            pin_memory=True,
+        )
+        
+        test_loader = DataLoader(
+            test_dataset,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=num_workers,
+            pin_memory=True,
+        )
+        
+        return train_loader, val_loader, test_loader, class_names
+    
+    else:
+        # 使用原来的逻辑：从 dataset_path 分割
+        if dataset_path is None:
+            raise ValueError("必须提供 dataset_path 或 train_dir 和 val_dir")
+        
+        dataset_path = Path(dataset_path)
+        if not dataset_path.exists():
+            raise ValueError(f"数据集路径不存在: {dataset_path}")
+        
+        # 使用自定义数据集类（已在函数开始处定义）
+        full_dataset = LabeledImageFolder(root=str(dataset_path))
     
     # 获取类别信息
     class_names = full_dataset.class_names

@@ -93,21 +93,34 @@ def load_pretrained_model(model_name: str, device: torch.device):
     model.eval()
     model = model.to(device)
     
-    # 获取类别名称
+    # 获取类别名称（如果可用）
+    class_names = None
     if hasattr(model, 'default_cfg') and model.default_cfg:
         label_names = model.default_cfg.get("label_names")
         if label_names:
             class_names = list(label_names)
-        else:
-            raise ValueError(f"模型 {model_name} 没有在 default_cfg 中提供 label_names")
-    else:
-        raise ValueError(f"模型 {model_name} 没有 default_cfg")
     
-    num_classes = len(class_names)
+    # 如果无法获取类别名称，通过模型输出层获取类别数
+    if class_names is None:
+        # 通过模型的分类层获取输出类别数
+        with torch.no_grad():
+            dummy_input = torch.randn(1, 3, 336, 336).to(device)
+            dummy_output = model(dummy_input)
+            num_classes = dummy_output.shape[1]
+        
+        # 创建占位符类别名称列表（仅用于索引，不包含实际名称）
+        class_names = [f"class_{i}" for i in range(num_classes)]
+        print(f"⚠ 模型 {model_name} 没有在 default_cfg 中提供 label_names")
+        print(f"  已通过模型输出层获取类别数: {num_classes}")
+        print(f"  将使用占位符类别名称进行评估（仅计算标签准确率）")
+    else:
+        num_classes = len(class_names)
+    
     print(f"模型信息:")
     print(f"  - 模型名称: {model_name}")
     print(f"  - 类别数: {num_classes}")
-    print(f"  - 类别名称示例: {class_names[:5]}...")
+    if class_names and len(class_names) > 0 and not class_names[0].startswith("class_"):
+        print(f"  - 类别名称示例: {class_names[:5]}...")
     
     # 获取图像尺寸和归一化参数
     if hasattr(model, 'default_cfg') and model.default_cfg:
@@ -249,6 +262,11 @@ def evaluate_model(
         original_label = extract_label_from_folder(folder_name)
         if original_label is None:
             print(f"警告: 无法从文件夹名称 '{folder_name}' 提取标签，跳过")
+            continue
+        
+        # 跳过标签为 0 (00000) 的样本
+        if original_label == 0:
+            print(f"跳过: 标签为 00000 的文件夹 '{folder_name}'")
             continue
         
         # 检查标签是否在映射中
@@ -420,16 +438,17 @@ def main():
         for folder in folders:
             folder_name = folder.name
             original_label = extract_label_from_folder(folder_name)
-            if original_label is not None:
+            if original_label is not None and original_label != 0:  # 跳过标签为 0 (00000) 的样本
                 test_labels.add(original_label)
         
-        # 建立映射：假设测试集标签直接对应 iNaturalist 类别索引
+        # 建立映射：假设测试集标签直接对应模型类别索引
+        num_classes = len(class_names)
         label_mapping = {}
         for test_label in test_labels:
-            if 0 <= test_label < len(class_names):
+            if 0 <= test_label < num_classes:
                 label_mapping[test_label] = test_label
             else:
-                print(f"警告: 测试集标签 {test_label} 超出 iNaturalist 类别范围 [0, {len(class_names)-1}]")
+                print(f"警告: 测试集标签 {test_label} 超出模型类别范围 [0, {num_classes-1}]，跳过")
     else:
         # 对于本地训练的模型，从类别名称建立映射
         label_mapping = build_label_mapping_from_class_names(class_names)
@@ -449,3 +468,10 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+# python evaluate_model.py \
+# --model hf_hub:timm/vit_large_patch14_clip_336.laion2b_ft_augreg_inat21 \
+#     --test-dir /root/autodl-fs/val
