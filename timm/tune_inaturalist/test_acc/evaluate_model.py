@@ -473,5 +473,5 @@ if __name__ == '__main__':
 
 
 # python evaluate_model.py \
-# --model hf_hub:timm/vit_large_patch14_clip_336.laion2b_ft_augreg_inat21 \
+# --model hf_hub:timm/vit_large_patch14_clip_336.datacompxl_ft_inat21 \
 #     --test-dir /root/autodl-fs/val
