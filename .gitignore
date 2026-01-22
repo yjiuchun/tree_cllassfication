@@ -1,0 +1,99 @@
+# 用户指定的目录
+yunnan360/
+images/
+timm/tune_inaturalist/dataset*/
+
+# Python 相关
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyTorch 相关
+*.pth
+*.pt
+*.ckpt
+*.pth.tar
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# 虚拟环境
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 训练输出和日志
+outputs/
+logs/
+*.log
+tensorboard_logs/
+wandb/
+
+# 数据文件
+*.csv
+*.json
+*.h5
+*.hdf5
+*.npz
+*.npy
+
+# 图片文件（如果需要忽略所有图片，取消下面的注释）
+# *.jpg
+# *.jpeg
+# *.png
+# *.bmp
+# *.gif
+
+# macOS 隐藏文件
+._*
+.DS_Store
+
+# Windows 隐藏文件
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 临时文件
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# 模型检查点（如果需要保留某些检查点，可以单独添加）
+# 但通常训练输出目录已经在上面的 outputs/ 中忽略了
+
+# 其他
+*.zip
+*.tar.gz
+*.rar
