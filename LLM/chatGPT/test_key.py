@@ -4,7 +4,6 @@ import requests
 from openai import OpenAI
 
 # 从环境变量或demo.py中获取API Key
-API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 def test_network_connectivity():
     """测试网络连接"""

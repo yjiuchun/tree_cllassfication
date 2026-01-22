@@ -9,7 +9,6 @@ from datetime import datetime
 
 # 配置
 # 优先从环境变量读取API Key，如果没有则使用这里设置的值
-API_KEY = os.getenv("OPENAI_API_KEY", "")  # 请替换为你的API Key或设置环境变量
 FOLDER_NAMES_CSV = "/root/folder_names.csv"
 VAL_DIR = "/root/autodl-fs/val"
 OUTPUT_DIR = "/root/tree_cllassfication/LLM/chatGPT"
