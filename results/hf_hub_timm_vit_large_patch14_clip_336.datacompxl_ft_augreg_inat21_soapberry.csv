@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/soapberry/5.jpg,5.jpg,7708,Arbutus xalapensis,0.097178
+/home/yjc/Project/plant_classfication/images/soapberry/2.jpg,2.jpg,9531,Mangifera indica,0.073192
+/home/yjc/Project/plant_classfication/images/soapberry/1.jpg,1.jpg,9591,Sapindus drummondii,0.360745
+/home/yjc/Project/plant_classfication/images/soapberry/3.jpg,3.jpg,7708,Arbutus xalapensis,0.097178
+/home/yjc/Project/plant_classfication/images/soapberry/4.jpg,4.jpg,9531,Mangifera indica,0.784925

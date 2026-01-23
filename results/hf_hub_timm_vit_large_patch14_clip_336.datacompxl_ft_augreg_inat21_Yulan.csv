@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/Yulan/5.jpg,5.jpg,8764,Magnolia virginiana,0.018627
+/home/yjc/Project/plant_classfication/images/Yulan/2.jpg,2.jpg,8761,Magnolia grandiflora,0.141605
+/home/yjc/Project/plant_classfication/images/Yulan/1.jpg,1.jpg,9359,Amelanchier arborea,0.189542
+/home/yjc/Project/plant_classfication/images/Yulan/3.jpg,3.jpg,8919,Cochlospermum vitifolium,0.281107
+/home/yjc/Project/plant_classfication/images/Yulan/4.jpg,4.jpg,7598,Cornus florida,0.059834

@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/Cedar/5.jpg,5.jpg,9847,Tsuga mertensiana,0.011929
+/home/yjc/Project/plant_classfication/images/Cedar/2.jpg,2.jpg,9803,Larix decidua,0.852246
+/home/yjc/Project/plant_classfication/images/Cedar/1.jpg,1.jpg,9846,Tsuga heterophylla,0.288830
+/home/yjc/Project/plant_classfication/images/Cedar/3.jpg,3.jpg,9799,Abies concolor,0.008529
+/home/yjc/Project/plant_classfication/images/Cedar/4.jpg,4.jpg,9846,Tsuga heterophylla,0.061571

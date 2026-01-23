@@ -61,7 +61,7 @@ tensorboard_logs/
 wandb/
 
 # 数据文件
-*.csv
+# *.csv
 *.json
 *.h5
 *.hdf5

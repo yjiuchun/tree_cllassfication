@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/Ginkgo/5.jpg,5.jpg,9503,Ulmus minor,0.028462
+/home/yjc/Project/plant_classfication/images/Ginkgo/2.jpg,2.jpg,8861,Populus nigra,0.071735
+/home/yjc/Project/plant_classfication/images/Ginkgo/1.jpg,1.jpg,3766,Cyanopica cyanus,0.069625
+/home/yjc/Project/plant_classfication/images/Ginkgo/3.jpg,3.jpg,9304,Broussonetia papyrifera,0.013560
+/home/yjc/Project/plant_classfication/images/Ginkgo/4.jpg,4.jpg,9314,Morus indica,0.015738

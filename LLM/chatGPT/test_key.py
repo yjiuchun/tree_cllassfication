@@ -1,33 +1,14 @@
+#!/usr/bin/python3
+"""测试 OpenAI API Key 是否有效（使用新版 OpenAI API >=1.0.0）"""
+
 import os
-import socket
-import requests
 from openai import OpenAI
 
-# 从环境变量获取API Key
+# 从环境变量或直接设置 API 密钥
 API_KEY = os.getenv("OPENAI_API_KEY", "")
 
-def test_network_connectivity():
-    """测试网络连接"""
-    print("🔍 检查网络连接...")
-    try:
-        # 测试DNS解析
-        socket.gethostbyname("api.openai.com")
-        print("  ✅ DNS 解析正常")
-        
-        # 测试HTTP连接
-        response = requests.get("https://api.openai.com", timeout=5)
-        print(f"  ✅ 可以连接到 OpenAI API (状态码: {response.status_code})")
-        return True
-    except socket.gaierror:
-        print("  ❌ DNS 解析失败，无法解析 api.openai.com")
-        return False
-    except requests.exceptions.RequestException as e:
-        print(f"  ❌ 网络连接失败: {e}")
-        print("  💡 可能需要配置代理或检查防火墙设置")
-        return False
-
 def test_api_key():
-    """测试OpenAI API Key是否有效"""
+    """测试 OpenAI API Key 是否有效"""
     print("=" * 50)
     print("正在测试 OpenAI API Key...")
     print("=" * 50)
@@ -40,27 +21,22 @@ def test_api_key():
     print(f"API Key 前缀: {API_KEY[:20]}...")
     print()
     
-    # 先测试网络连接
-    if not test_network_connectivity():
-        print()
-        print("⚠️  网络连接测试失败，但继续尝试 API 调用...")
-        print()
-    
     try:
-        # 初始化客户端
+        # 初始化客户端（新版 API）
         client = OpenAI(api_key=API_KEY)
         
-        # 测试简单的文本对话
+        # 调用 ChatGPT 模型进行对话（新版 API）
         print("📤 发送测试请求...")
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",  # 使用较便宜的模型进行测试
+            model="gpt-4o-mini",  # 使用较便宜的模型进行测试
             messages=[
-                {"role": "user", "content": "请回复'API测试成功'来确认连接正常。"}
+                {"role": "system", "content": "你是一个乐于助人的助手。"},
+                {"role": "user", "content": "你好，能介绍一下自己吗？请用一句话回复。"}
             ],
-            max_tokens=50
+            max_tokens=100
         )
         
-        # 获取回复
+        # 获取回复（新版 API 的访问方式）
         reply = response.choices[0].message.content
         print(f"📥 收到回复: {reply}")
         print()
@@ -92,32 +68,14 @@ def test_api_key():
         error_str = str(e).lower()
         error_type = type(e).__name__
         
-        if "APIConnectionError" in error_type or "connection" in error_str:
-            print("💡 网络连接问题，可能的原因:")
-            print("   1. 服务器无法访问外网（需要配置代理）")
-            print("   2. 防火墙阻止了连接")
-            print("   3. OpenAI API 服务暂时不可用")
-            print("   4. 网络延迟过高或超时")
-            print()
-            print("   解决方案:")
-            print("   - 如果在中国大陆，可能需要配置代理:")
-            print("     export HTTPS_PROXY='http://your-proxy:port'")
-            print("     export HTTP_PROXY='http://your-proxy:port'")
-        elif "AuthenticationError" in error_type or "invalid" in error_str or "authentication" in error_str:
-            print("💡 API Key 认证问题，请检查:")
-            print("   1. API Key 是否正确复制（没有多余空格）")
-            print("   2. API Key 是否已过期或被撤销")
-            print("   3. 账户是否有足够的余额")
-            print("   4. API Key 是否有访问所需模型的权限")
-        elif "RateLimitError" in error_type or "rate limit" in error_str:
+        if "insufficient_quota" in error_str or ("quota" in error_str and "exceeded" in error_str):
+            print("💡 API 配额不足，请访问 https://platform.openai.com/account/billing 检查余额并充值")
+        elif "authentication" in error_str or "invalid" in error_str:
+            print("💡 API Key 认证问题，请检查 API Key 是否正确")
+        elif "rate limit" in error_str:
             print("💡 请求频率限制，请稍后再试")
-        elif "APIError" in error_type:
-            print("💡 OpenAI API 服务错误，请稍后重试")
         else:
-            print("💡 其他错误，请检查:")
-            print("   1. OpenAI 服务状态")
-            print("   2. 网络连接")
-            print("   3. API Key 有效性")
+            print("💡 其他错误，请检查网络连接和 API Key 有效性")
         
         return False
 

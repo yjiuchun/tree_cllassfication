@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/Zelkova/5.jpg,5.jpg,8218,Juglans regia,0.082021
+/home/yjc/Project/plant_classfication/images/Zelkova/2.jpg,2.jpg,9504,Ulmus parvifolia,0.275266
+/home/yjc/Project/plant_classfication/images/Zelkova/1.jpg,1.jpg,9574,Acer palmatum,0.381988
+/home/yjc/Project/plant_classfication/images/Zelkova/3.jpg,3.jpg,7955,Enterolobium cyclocarpum,0.438629
+/home/yjc/Project/plant_classfication/images/Zelkova/4.jpg,4.jpg,9504,Ulmus parvifolia,0.055806

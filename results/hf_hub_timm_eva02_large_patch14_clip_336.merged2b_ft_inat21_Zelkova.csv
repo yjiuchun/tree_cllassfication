@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/Zelkova/5.jpg,5.jpg,9554,Melia azedarach,0.108646
+/home/yjc/Project/plant_classfication/images/Zelkova/2.jpg,2.jpg,9504,Ulmus parvifolia,0.435550
+/home/yjc/Project/plant_classfication/images/Zelkova/1.jpg,1.jpg,9504,Ulmus parvifolia,0.082116
+/home/yjc/Project/plant_classfication/images/Zelkova/3.jpg,3.jpg,7955,Enterolobium cyclocarpum,0.427830
+/home/yjc/Project/plant_classfication/images/Zelkova/4.jpg,4.jpg,9503,Ulmus minor,0.229413

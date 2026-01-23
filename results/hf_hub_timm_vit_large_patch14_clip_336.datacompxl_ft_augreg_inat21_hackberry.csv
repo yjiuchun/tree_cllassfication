@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/hackberry/5.jpg,5.jpg,8749,Cinnamomum camphora,0.040665
+/home/yjc/Project/plant_classfication/images/hackberry/2.jpg,2.jpg,8547,Fraxinus excelsior,0.045191
+/home/yjc/Project/plant_classfication/images/hackberry/1.jpg,1.jpg,8749,Cinnamomum camphora,0.072334
+/home/yjc/Project/plant_classfication/images/hackberry/3.jpg,3.jpg,9289,Celtis laevigata,0.488789
+/home/yjc/Project/plant_classfication/images/hackberry/4.jpg,4.jpg,9289,Celtis laevigata,0.488789

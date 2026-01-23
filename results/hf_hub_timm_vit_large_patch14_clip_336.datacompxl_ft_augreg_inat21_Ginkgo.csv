@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/Ginkgo/5.jpg,5.jpg,8147,Betula nigra,0.102435
+/home/yjc/Project/plant_classfication/images/Ginkgo/2.jpg,2.jpg,7935,Cercis occidentalis,0.135063
+/home/yjc/Project/plant_classfication/images/Ginkgo/1.jpg,1.jpg,8551,Fraxinus velutina,0.037334
+/home/yjc/Project/plant_classfication/images/Ginkgo/3.jpg,3.jpg,9580,Acer saccharum,0.108717
+/home/yjc/Project/plant_classfication/images/Ginkgo/4.jpg,4.jpg,8165,Fagus sylvatica,0.198108

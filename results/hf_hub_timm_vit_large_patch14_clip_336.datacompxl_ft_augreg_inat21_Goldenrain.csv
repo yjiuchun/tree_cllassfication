@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/Goldenrain/5.jpg,5.jpg,9590,Koelreuteria paniculata,0.494419
+/home/yjc/Project/plant_classfication/images/Goldenrain/2.jpg,2.jpg,9590,Koelreuteria paniculata,0.424822
+/home/yjc/Project/plant_classfication/images/Goldenrain/1.jpg,1.jpg,9554,Melia azedarach,0.299891
+/home/yjc/Project/plant_classfication/images/Goldenrain/3.jpg,3.jpg,9590,Koelreuteria paniculata,0.917367
+/home/yjc/Project/plant_classfication/images/Goldenrain/4.jpg,4.jpg,9590,Koelreuteria paniculata,0.952043

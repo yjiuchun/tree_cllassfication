@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/Platanus/5.jpg,5.jpg,9121,Platanus occidentalis,0.766176
+/home/yjc/Project/plant_classfication/images/Platanus/2.jpg,2.jpg,9121,Platanus occidentalis,0.944496
+/home/yjc/Project/plant_classfication/images/Platanus/1.jpg,1.jpg,9121,Platanus occidentalis,0.980962
+/home/yjc/Project/plant_classfication/images/Platanus/3.jpg,3.jpg,9121,Platanus occidentalis,0.354759
+/home/yjc/Project/plant_classfication/images/Platanus/4.jpg,4.jpg,9121,Platanus occidentalis,0.218813

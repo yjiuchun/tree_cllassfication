@@ -1,0 +1,6 @@
+图片路径,图片名称,预测类别ID,预测类别名称,置信度
+/home/yjc/Project/plant_classfication/images/Camphor tree/5.jpg,5.jpg,8749,Cinnamomum camphora,0.503179
+/home/yjc/Project/plant_classfication/images/Camphor tree/2.jpg,2.jpg,8749,Cinnamomum camphora,0.920415
+/home/yjc/Project/plant_classfication/images/Camphor tree/1.jpg,1.jpg,8749,Cinnamomum camphora,0.893342
+/home/yjc/Project/plant_classfication/images/Camphor tree/3.jpg,3.jpg,8937,Ceiba pentandra,0.074720
+/home/yjc/Project/plant_classfication/images/Camphor tree/4.jpg,4.jpg,8749,Cinnamomum camphora,0.983300
