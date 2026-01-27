@@ -28,9 +28,9 @@ def test_api_key():
         # 调用 ChatGPT 模型进行对话（新版 API）
         print("📤 发送测试请求...")
         response = client.chat.completions.create(
-            model="gpt-4o-mini",  # 使用较便宜的模型进行测试
+            model="gpt-5",  # 使用较便宜的模型进行测试
             messages=[
-                {"role": "system", "content": "你是一个乐于助人的助手。"},
+                {"role": "system", "content": "hello"},
                 {"role": "user", "content": "你好，能介绍一下自己吗？请用一句话回复。"}
             ],
             max_tokens=100

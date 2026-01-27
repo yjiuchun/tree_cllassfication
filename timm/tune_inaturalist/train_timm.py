@@ -769,12 +769,18 @@ def main():
     # 恢复训练
     start_epoch = 0
     best_acc1 = 0.0
+    train_history = []
+    val_history = []
+    lr_history = []
     
     if args.resume:
         print(f"\n恢复训练: {args.resume}")
         checkpoint = torch.load(args.resume, map_location=device)
         start_epoch = checkpoint['epoch']
         best_acc1 = checkpoint.get('best_acc1', 0.0)
+        train_history = checkpoint.get('train_history', [])
+        val_history = checkpoint.get('val_history', [])
+        lr_history = checkpoint.get('lr_history', [])
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
@@ -783,6 +789,7 @@ def main():
         if args.model_ema and 'model_ema_state_dict' in checkpoint:
             model_ema.load_state_dict(checkpoint['model_ema_state_dict'])
         print(f"从 epoch {start_epoch} 恢复训练")
+        print(f"  - 恢复训练历史: {len(train_history)} 个 epoch")
     
     # 训练循环
     print(f"\n{'='*60}")
@@ -872,15 +879,15 @@ if __name__ == '__main__':
     main()
 
 
-python train_timm.py \
-    --train-dir /home/yjc/Project/plant_classfication/timm/tune_inaturalist/dataset_150 \
-    --val-dir /home/yjc/Project/plant_classfication/timm/tune_inaturalist/dataset_val \
-    --model efficientnet_b0 \
-    --epochs 100 \
-    --batch-size 32 \
-    --grad-accum-steps 8 \
-    --amp \
-    --seed 42 \
-    --output outputs/003_efficientnet_b0_timm_args
-    --opt adamw
-    --lr 0.0001
+# python train_timm.py \
+#     --train-dir /home/yjc/Project/plant_classfication/timm/tune_inaturalist/dataset_test \
+#     --val-dir /home/yjc/Project/plant_classfication/timm/tune_inaturalist/dataset_set_val_test \
+#     --model efficientnet_b0 \
+#     --epochs 25 \
+#     --batch-size 32 \
+#     --grad-accum-steps 8 \
+#     --amp \
+#     --seed 42 \
+#     --output outputs/003_efficientnet_b0_test \
+#     --opt adamw \
+#     --lr 0.0001 

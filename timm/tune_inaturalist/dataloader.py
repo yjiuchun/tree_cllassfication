@@ -73,7 +73,7 @@ def get_transforms(
             transforms.RandomRotation(degrees=15),
             transforms.ToTensor(),
             transforms.Normalize(mean=mean, std=std),
-            transforms.RandomErasing(p=0.1),  # 随机擦除
+            transforms.RandomErasing(p=0.01),  # 随机擦除
         ])
     else:
         # 验证/测试时：只做预处理
